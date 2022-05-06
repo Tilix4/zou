@@ -110,9 +110,36 @@ gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker -
 
 ## Tests
 
-To run unit tests we recommend to use another database. For that set the
-`DB_DATABASE` environment variable:
+To run unit tests we recommend to use another database. Following the same steps as for the main database, create a `zou_test` DB in your postgreSQL instance.
+
+```
+sudo su -l postgres
+psql -c 'create database zou_test;' -U postgres
+```
+
+Once your database is created, you'll be able to perform all python tests for this dedicated database by setting the `DB_DATABASE` environment variable:
 
 ```bash
-DB_DATABASE=zou-test py.test
+DB_DATABASE=zou_test #--code to perform--#
 ```
+
+To actually run the tests, you must first init the data:
+
+```
+DB_DATABASE=zou_test zou/cli.py clear-db
+DB_DATABASE=zou_test zou/cli.py init-db
+DB_DATABASE=zou_test zou/cli.py init-data
+```
+
+And then perform all tests:
+
+```
+DB_DATABASE=zou_test py.test
+```
+
+In case you are writing tests for a part of the code and you don't want to run them all every time, you can specify the file to run:
+
+```
+DB_DATABASE=zou_test py.test tests/models/test_task_type.py
+```
+
